@@ -48,6 +48,9 @@ struct Object
 
 Object triangle;
 Object quad;
+
+// Für den Kreis benötigte Variablen. Er hat eine initial Größe von 5 Kanten, bei einem 1er Radius
+// vector0 ist der Mittelpunkt des Kreises
 Object circ;
 int radius = 1;
 GLint sides = 5;
@@ -194,33 +197,38 @@ void initQuad()
 
 void initCircle()
 {
+	// Variablen deklarieren
+	// Koordianten Arrays haben die Größe 31, um genug Platz für alle 30 Kanten zu bieten.
 	const GLint verts = sides +2;
-	GLfloat circleX[30];
-	GLfloat circleY[30];
-	GLfloat circleZ[30];
+	GLfloat circleX[31];
+	GLfloat circleY[31];
+	GLfloat circleZ[31];
 	std::vector<glm::vec3> vertices;
 	std::vector<glm::vec3> colors;
 	std::vector<GLushort> indices;
 	
+	// Hier werden die Vektorkoordinaten berechnet, für jeden Punkt
 	for (int i = 0; i < verts; i++)
 	{
 		circleX[i] = radius * cos(i * (PI * 2) / sides);
 		circleY[i] = radius * sin(i * (PI * 2) / sides);
 		circleZ[i] = 0;
 	}
-	// Collect vertices. These vectors can go out of scope after we have send all data to the graphics card.
+	// Jetzt die Koordinaten zu Vektoren bündeln
 	for (int i = 0; i < verts; i++)
 	{
 		vertices.push_back(glm::vec3(circleX[i], circleY[i], circleZ[i]));
 		colors.push_back(glm::vec3(0.2f, 0.9f, 0.9f));
 
 	}
+	// Und die Kanten festlegen.
 	for (int i = 1; i <= sides - 1; i++)
 	{
 		indices.push_back(0);
 		indices.push_back(i);
 		indices.push_back(i + 1);
 	}
+	// Die letzte Kante ist eine Ausnahme, weswegen sie extra hinzugefügt wird
 	indices.push_back(0);
 	indices.push_back(sides);
 	indices.push_back(1);
