@@ -15,9 +15,9 @@
 #include "GLTools.h"
 
 // Standard window width
-const int WINDOW_WIDTH  = 640;
+const int WINDOW_WIDTH  = 1200;
 // Standard window height
-const int WINDOW_HEIGHT = 480;
+const int WINDOW_HEIGHT = 600;
 // GLUT window id/handle
 int glutID = 0;
 
@@ -198,11 +198,11 @@ void initQuad()
 void initCircle()
 {
 	// Variablen deklarieren
-	// Koordianten Arrays haben die Größe 31, um genug Platz für alle 30 Kanten zu bieten.
+	// Koordianten Arrays haben die Größe 32, um genug Platz für alle 30 Kanten zu bieten.
 	const GLint verts = sides +2;
-	GLfloat circleX[31];
-	GLfloat circleY[31];
-	GLfloat circleZ[31];
+	GLfloat circleX[32];
+	GLfloat circleY[32];
+	GLfloat circleZ[32];
 	std::vector<glm::vec3> vertices;
 	std::vector<glm::vec3> colors;
 	std::vector<GLushort> indices;
