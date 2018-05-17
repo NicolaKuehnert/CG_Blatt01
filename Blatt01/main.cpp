@@ -44,15 +44,46 @@ void renderQuad()
 	
 	// Bind vertex array object so we can render the 2 triangles.
 	//2 triangles have 6 vertices
-	quad.renderObject(6);
+	quad.renderObject(12*3);
 }
 
 void initQuad()
 {
-	// Construct triangle. These vectors can go out of scope after we have send all data to the graphics card.
-	const std::vector<glm::vec3> vertices = { { -1.0f, 1.0f, 0.0f }, { -1.0, -1.0, 0.0 }, { 1.0f, -1.0f, 0.0f }, { 1.0f, 1.0f, 0.0f } };
-	const std::vector<glm::vec3> colors = { { 1.0f, 0.0f, 0.0f }, { 1.0f, 1.0, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f } };
-	const std::vector<GLushort> indices = { 0, 1, 2, 0, 2, 3 };
+	// Construct triangles. These vectors can go out of scope after we have send all data to the graphics card.
+	const std::vector<glm::vec3> vertices = {
+		{0.0f, 0.0f, 0.0f}, // 0
+		{0.0f, 1.0f, 0.0f}, // 1
+		{1.0f, 1.0f, 0.0f}, // 2
+		//{0.0f, 0.0f, 0.0f},
+		{1.0f, 0.0f, 0.0f}, // 3
+		{1.0f, 0.0f, 1.0f}, // 4
+		{1.0f, 1.0f, 1.0f}, // 5
+		{0.0f, 1.0f, 1.0f}, // 6
+		{0.0f, 0.0f, 1.0f}  // 7
+	};
+	const std::vector<glm::vec3> colors = { 
+		{ 1.0f, 0.0f, 0.0f }, // 0
+		{ 1.0f, 0.0f, 0.0f }, // 1
+		{ 1.0f, 0.0f, 0.0f }, // 2
+		{ 0.0f, 1.0f, 0.0f }, // 3
+		{ 0.0f, 1.0f, 0.0f }, // 4
+		{ 0.0f, 1.0f, 0.0f }, // 5
+		{ 0.0f, 0.0f, 1.0f }, // 6
+		{ 0.0f, 0.0f, 1.0f }  // 7
+
+	};
+	const std::vector<GLushort> indices = { 
+		0, 1, 2, // vorne 1
+		0, 3, 4, // vorne 2
+		0, 4, 5, // unten 1
+		0, 7, 5, // unten 2
+		0, 2, 6, // links 1
+		0, 7, 6, // links 2
+		4, 5, 2, // rechts 1
+		4, 2, 3, // rechts 2
+		4, 7, 6, // hinten 1
+		4, 5, 6  // hinten 2
+		};
 
 	GLuint programId = program.getHandle();
 	quad.initObject(vertices, colors, indices, programId);
@@ -175,7 +206,7 @@ int main(int argc, char** argv)
 	glutInitContextFlags  (GLUT_FORWARD_COMPATIBLE | GLUT_DEBUG);
 	glutInitDisplayMode   (GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH | GLUT_MULTISAMPLE);
 
-	glutCreateWindow("Aufgabenblatt 01");
+	glutCreateWindow("Computergrafik - Praktikum");
 	glutID = glutGetWindow();
 	  
 	// GLEW: Load opengl extensions
