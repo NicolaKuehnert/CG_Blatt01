@@ -4,7 +4,6 @@
 
 
 #include <GL/glew.h>
-//#include <GL/gl.h> // OpenGL header not necessary, included by GLEW
 #include <GL/freeglut.h>
 
 #include <glm/glm.hpp>
@@ -13,6 +12,7 @@
 
 #include "GLSLProgram.h"
 #include "GLTools.h"
+#include "GraphicObject.h"
 
 // Standard window width
 const int WINDOW_WIDTH  = 1200;
@@ -29,63 +29,9 @@ glm::mat4x4 projection;
 float zNear = 0.1f;
 float zFar  = 100.0f;
 
-/*
-Struct to hold data for object rendering.
-*/
-struct Object
-{
-	/* IDs for several buffers. */
-	GLuint vao;
 
-	GLuint positionBuffer;
-	GLuint colorBuffer;
+GraphicObject quad;
 
-	GLuint indexBuffer;
-
-	/* Model matrix */
-	glm::mat4x4 model;
-};
-
-Object triangle;
-Object quad;
-
-// Für den Kreis benötigte Variablen. Er hat eine initial Größe von 5 Kanten, bei einem 1er Radius
-// vector0 ist der Mittelpunkt des Kreises
-Object circ;
-int radius = 1;
-GLint sides = 5;
-const float PI = 3.14159265359;
-glm::vec3 vector0 = { 0.0f, 0.0f, 0.0f };
-
-void renderCircle()
-{
-	// Create mvp.
-	glm::mat4x4 mvp = projection * view * circ.model;
-
-	// Bind the shader program and set uniform(s).
-	program.use();
-	program.setUniform("mvp", mvp);
-
-	// Bind vertex array object so we can render the triangles (sides * 3).
-	glBindVertexArray(circ.vao);
-	glDrawElements(GL_TRIANGLES, sides * 3, GL_UNSIGNED_SHORT, 0);
-	glBindVertexArray(0);
-}
-
-void renderTriangle()
-{
-	// Create mvp.
-	glm::mat4x4 mvp = projection * view * triangle.model;
-
-	// Bind the shader program and set uniform(s).
-	program.use();
-	program.setUniform("mvp", mvp);
-
-	// Bind vertex array object so we can render the 1 triangle.
-	glBindVertexArray(triangle.vao);
-	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, 0);
-	glBindVertexArray(0);
-}
 
 void renderQuad()
 {
@@ -97,56 +43,8 @@ void renderQuad()
 	program.setUniform("mvp", mvp);
 	
 	// Bind vertex array object so we can render the 2 triangles.
-	glBindVertexArray(quad.vao);
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
-	glBindVertexArray(0);
-}
-
-
-void initTriangle()
-{
-	// Construct triangle. These vectors can go out of scope after we have send all data to the graphics card.
-	const std::vector<glm::vec3> vertices = { glm::vec3(-1.0f, 1.0f, 0.0f), glm::vec3(1.0f, -1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 0.0f) };
-	const std::vector<glm::vec3> colors = { glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f) };
-	const std::vector<GLushort> indices = { 0, 1, 2 };
-
-	GLuint programId = program.getHandle();
-	GLuint pos;
-
-	// Step 0: Create vertex array object.
-	glGenVertexArrays(1, &triangle.vao);
-	glBindVertexArray(triangle.vao);
-
-	// Step 1: Create vertex buffer object for position attribute and bind it to the associated "shader attribute".
-	glGenBuffers(1, &triangle.positionBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, triangle.positionBuffer);
-	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), vertices.data(), GL_STATIC_DRAW);
-
-	// Bind it to position.
-	pos = glGetAttribLocation(programId, "position");
-	glEnableVertexAttribArray(pos);
-	glVertexAttribPointer(pos, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-	// Step 2: Create vertex buffer object for color attribute and bind it to...
-	glGenBuffers(1, &triangle.colorBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, triangle.colorBuffer);
-	glBufferData(GL_ARRAY_BUFFER, colors.size() * sizeof(glm::vec3), colors.data(), GL_STATIC_DRAW);
-
-	// Bind it to color.
-	pos = glGetAttribLocation(programId, "color");
-	glEnableVertexAttribArray(pos);
-	glVertexAttribPointer(pos, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-	// Step 3: Create vertex buffer object for indices. No binding needed here.
-	glGenBuffers(1, &triangle.indexBuffer);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, triangle.indexBuffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLushort), indices.data(), GL_STATIC_DRAW);
-
-	// Unbind vertex array object (back to default).
-	glBindVertexArray(0);
-
-	// Modify model matrix.
-	triangle.model = glm::translate(glm::mat4(1.0f), glm::vec3(-2.25f, 0.0f, 0.0f));
+	//2 triangles have 6 vertices
+	quad.renderObject(6);
 }
 
 void initQuad()
@@ -157,119 +55,7 @@ void initQuad()
 	const std::vector<GLushort> indices = { 0, 1, 2, 0, 2, 3 };
 
 	GLuint programId = program.getHandle();
-	GLuint pos;
-
-	// Step 0: Create vertex array object.
-	glGenVertexArrays(1, &quad.vao);
-	glBindVertexArray(quad.vao);
-
-	// Step 1: Create vertex buffer object for position attribute and bind it to the associated "shader attribute".
-	glGenBuffers(1, &quad.positionBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, quad.positionBuffer);
-	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), vertices.data(), GL_STATIC_DRAW);
-
-	// Bind it to position.
-	pos = glGetAttribLocation(programId, "position");
-	glEnableVertexAttribArray(pos);
-	glVertexAttribPointer(pos, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-	// Step 2: Create vertex buffer object for color attribute and bind it to...
-	glGenBuffers(1, &quad.colorBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, quad.colorBuffer);
-	glBufferData(GL_ARRAY_BUFFER, colors.size() * sizeof(glm::vec3), colors.data(), GL_STATIC_DRAW);
-
-	// Bind it to color.
-	pos = glGetAttribLocation(programId, "color");
-	glEnableVertexAttribArray(pos);
-	glVertexAttribPointer(pos, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-	// Step 3: Create vertex buffer object for indices. No binding needed here.
-	glGenBuffers(1, &quad.indexBuffer);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, quad.indexBuffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLushort), indices.data(), GL_STATIC_DRAW);
-
-	// Unbind vertex array object (back to default).
-	glBindVertexArray(0);
-
-	// Modify model matrix.
-	quad.model = glm::translate(glm::mat4(1.0f), glm::vec3(0.25f, 0.0f, 0.0f));
-}
-
-void initCircle()
-{
-	// Variablen deklarieren
-	// Koordianten Arrays haben die Größe 32, um genug Platz für alle 30 Kanten zu bieten.
-	const GLint verts = sides +2;
-	GLfloat circleX[32];
-	GLfloat circleY[32];
-	GLfloat circleZ[32];
-	std::vector<glm::vec3> vertices;
-	std::vector<glm::vec3> colors;
-	std::vector<GLushort> indices;
-	
-	// Hier werden die Vektorkoordinaten berechnet, für jeden Punkt
-	for (int i = 0; i < verts; i++)
-	{
-		circleX[i] = radius * cos(i * (PI * 2) / sides);
-		circleY[i] = radius * sin(i * (PI * 2) / sides);
-		circleZ[i] = 0;
-	}
-	// Jetzt die Koordinaten zu Vektoren bündeln
-	for (int i = 0; i < verts; i++)
-	{
-		vertices.push_back(glm::vec3(circleX[i], circleY[i], circleZ[i]));
-		colors.push_back(glm::vec3(0.2f, 0.9f, 0.9f));
-
-	}
-	// Und die Kanten festlegen.
-	for (int i = 1; i <= sides - 1; i++)
-	{
-		indices.push_back(0);
-		indices.push_back(i);
-		indices.push_back(i + 1);
-	}
-	// Die letzte Kante ist eine Ausnahme, weswegen sie extra hinzugefügt wird
-	indices.push_back(0);
-	indices.push_back(sides);
-	indices.push_back(1);
-
-	GLuint programId = program.getHandle();
-	GLuint pos;
-
-	// Step 0: Create vertex array object.
-	glGenVertexArrays(1, &circ.vao);
-	glBindVertexArray(circ.vao);
-
-	// Step 1: Create vertex buffer object for position attribute and bind it to the associated "shader attribute".
-	glGenBuffers(1, &circ.positionBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, circ.positionBuffer);
-	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), vertices.data(), GL_STATIC_DRAW);
-
-	// Bind it to position.
-	pos = glGetAttribLocation(programId, "position");
-	glEnableVertexAttribArray(pos);
-	glVertexAttribPointer(pos, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-	// Step 2: Create vertex buffer object for color attribute and bind it to...
-	glGenBuffers(1, &circ.colorBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, circ.colorBuffer);
-	glBufferData(GL_ARRAY_BUFFER, colors.size() * sizeof(glm::vec3), colors.data(), GL_STATIC_DRAW);
-
-	// Bind it to color.
-	pos = glGetAttribLocation(programId, "color");
-	glEnableVertexAttribArray(pos);
-	glVertexAttribPointer(pos, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-	// Step 3: Create vertex buffer object for indices. No binding needed here.
-	glGenBuffers(1, &circ.indexBuffer);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, circ.indexBuffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLushort), indices.data(), GL_STATIC_DRAW);
-
-	// Unbind vertex array object (back to default).
-	glBindVertexArray(0);
-
-	// Modify model matrix.
-	circ.model = glm::translate(glm::mat4(1.0f), glm::vec3(2.75f, 0.0f, 0.0f));
+	quad.initObject(vertices, colors, indices, programId);
 }
 
 /*
@@ -307,23 +93,11 @@ bool init()
 	}
 
 	// Create objects.
-	initTriangle();
 	initQuad();
-	initCircle();
 
 	return true;
 }
 
-/*
- Release object resources.
-*/
-void releaseObject(Object& obj)
-{
-	glDeleteVertexArrays(1, &obj.vao);
-	glDeleteBuffers(1, &obj.indexBuffer);
-	glDeleteBuffers(1, &obj.colorBuffer);
-	glDeleteBuffers(1, &obj.positionBuffer);
-}
 
 /*
  Release resources on termination.
@@ -331,8 +105,7 @@ void releaseObject(Object& obj)
 void release()
 {
 	// Shader program will be released upon program termination.
-	releaseObject(triangle);
-	releaseObject(quad);
+	quad.deleteObject();
 }
 
 /*
@@ -342,9 +115,7 @@ void render()
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	renderTriangle();
 	renderQuad();
-	renderCircle();
 }
 
 void glutDisplay ()
@@ -378,18 +149,8 @@ void glutKeyboard (unsigned char keycode, int x, int y)
 	  return;
 	  
 	case '+':
-		if (sides < 30)
-		{
-			sides += 1;
-		}
-		initCircle();
 		break;
 	case '-':
-		if (sides > 3)
-		{
-			sides -= 1;
-		}
-		initCircle();
 		break;
 	case 'q':
 		// do something
