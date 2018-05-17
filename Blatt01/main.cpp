@@ -105,9 +105,7 @@ bool init()
 void release()
 {
 	// Shader program will be released upon program termination.
-	triangle.deleteObject();
 	quad.deleteObject();
-	circ.deleteObject();
 }
 
 /*
