@@ -30,17 +30,8 @@ float zNear = 0.1f;
 float zFar  = 100.0f;
 
 
-GraphicObject triangle;
 GraphicObject quad;
 
-// Initial variables for an approximated circle with a radius of 1 and 5 sides
-// vector0 is the center of the circle
-GraphicObject circ;
-
-int radius = 1;
-GLint sides = 5;
-const float PI = 3.14159265359;
-glm::vec3 vector0 = { 0.0f, 0.0f, 0.0f };
 
 void renderQuad()
 {
