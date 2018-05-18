@@ -50,39 +50,105 @@ void renderQuad()
 void initQuad()
 {
 	// Construct triangles. These vectors can go out of scope after we have send all data to the graphics card.
+	// Every side has two triangles á 3 vertices
 	const std::vector<glm::vec3> vertices = {
-		{0.0f, 0.0f, 0.0f}, // 0
-		{0.0f, 1.0f, 0.0f}, // 1
-		{1.0f, 1.0f, 0.0f}, // 2
-		//{0.0f, 0.0f, 0.0f},
-		{1.0f, 0.0f, 0.0f}, // 3
-		{1.0f, 0.0f, 1.0f}, // 4
-		{1.0f, 1.0f, 1.0f}, // 5
-		{0.0f, 1.0f, 1.0f}, // 6
-		{0.0f, 0.0f, 1.0f}  // 7
-	};
-	const std::vector<glm::vec3> colors = { 
-		{ 1.0f, 0.0f, 0.0f }, // 0
-		{ 1.0f, 0.0f, 0.0f }, // 1
-		{ 1.0f, 0.0f, 0.0f }, // 2
-		{ 0.0f, 1.0f, 0.0f }, // 3
-		{ 0.0f, 1.0f, 0.0f }, // 4
-		{ 0.0f, 1.0f, 0.0f }, // 5
-		{ 0.0f, 0.0f, 1.0f }, // 6
-		{ 0.0f, 0.0f, 1.0f }  // 7
+		{0.0f, 0.0f, 0.0f},
+		{0.0f, 1.0f, 0.0f},
+		{1.0f, 1.0f, 0.0f},
+
+		{0.0f, 0.0f, 0.0f}, 
+		{1.0f, 0.0f, 0.0f},
+		{1.0f, 0.0f, 1.0f}, 
+
+		{0.0f, 0.0f, 0.0f}, 
+		{1.0f, 0.0f, 1.0f}, 
+		{1.0f, 1.0f, 1.0f}, 
+
+		{0.0f, 0.0f, 0.0f}, 
+		{1.0f, 1.0f, 1.0f}, 
+		{0.0f, 0.0f, 1.0f},
+
+		{0.0f, 0.0f, 0.0f},
+		{1.0f, 1.0f, 0.0f}, 
+		{0.0f, 1.0f, 1.0f},
+
+		{0.0f, 0.0f, 0.0f},
+		{0.0f, 1.0f, 1.0f}, 
+		{0.0f, 0.0f, 1.0f},
+
+		{1.0f, 1.0f, 0.0f},
+		{1.0f, 0.0f, 1.0f}, 
+		{1.0f, 1.0f, 1.0f}, 
+
+		{1.0f, 1.0f, 0.0f}, 
+		{1.0f, 0.0f, 0.0f}, 
+		{1.0f, 0.0f, 1.0f},
+
+		{1.0f, 0.0f, 1.0f}, 
+		{0.0f, 1.0f, 1.0f},
+		{0.0f, 0.0f, 1.0f},
+
+		{1.0f, 0.0f, 1.0f},
+		{1.0f, 1.0f, 1.0f}, 
+		{0.0f, 1.0f, 1.0f} 
 
 	};
+	
+	const std::vector<glm::vec3> colors = { 
+		{ 0.5f, 0.0f, 0.0f }, // front
+		{ 0.5f, 0.0f, 0.0f }, 
+		{ 0.5f, 0.0f, 0.0f }, 
+
+		{ 0.5f, 0.0f, 0.0f }, 
+		{ 0.5f, 0.0f, 0.0f }, 
+		{ 0.5f, 0.0f, 0.0f }, // end front
+
+		{ 1.0f, 0.0f, 0.0f }, // bottom
+		{ 1.0f, 0.0f, 0.0f },
+		{ 1.0f, 0.0f, 0.0f }, 
+
+		{ 1.0f, 0.0f, 0.0f }, 
+		{ 1.0f, 0.0f, 0.0f }, 
+		{ 1.0f, 0.0f, 0.0f }, // end bottom
+
+		{ 0.0f, 0.5f, 0.0f }, // left
+		{ 0.0f, 0.5f, 0.0f }, 
+		{ 0.0f, 0.5f, 0.0f },
+
+		{ 0.0f, 0.5f, 0.0f }, 
+		{ 0.0f, 0.5f, 0.0f }, 
+		{ 0.0f, 0.5f, 0.0f }, // end left
+
+		{ 0.0f, 1.0f, 0.0f }, // right
+		{ 0.0f, 1.0f, 0.0f }, 
+		{ 0.0f, 1.0f, 0.0f }, 
+
+		{ 0.0f, 1.0f, 0.0f }, 
+		{ 0.0f, 1.0f, 0.0f }, 
+		{ 0.0f, 1.0f, 0.0f }, // end right
+
+		{ 0.0f, 0.0f, 1.0f }, // back
+		{ 0.0f, 0.0f, 1.0f }, 
+		{ 0.0f, 0.0f, 1.0f },
+
+		{ 0.0f, 0.0f, 1.0f }, 
+		{ 0.0f, 0.0f, 1.0f }, 
+		{ 0.0f, 0.0f, 1.0f }  // end back
+
+	};
+
+	// The indices of the sides, beginning at the front
 	const std::vector<GLushort> indices = { 
-		0, 1, 2, // vorne 1
-		0, 3, 4, // vorne 2
-		0, 4, 5, // unten 1
-		0, 7, 5, // unten 2
-		0, 2, 6, // links 1
-		0, 7, 6, // links 2
-		4, 5, 2, // rechts 1
-		4, 2, 3, // rechts 2
-		4, 7, 6, // hinten 1
-		4, 5, 6  // hinten 2
+		0, 1, 2, // front
+		3, 4, 5,
+		6, 7, 8, // bottom
+		9, 10, 11, 
+		12, 13, 14, // left
+		15, 16, 17, 
+		18, 19, 20, // right
+		21, 22, 23,
+		24, 25, 26, // back
+		27, 28, 29 
 		};
 
 	GLuint programId = program.getHandle();
