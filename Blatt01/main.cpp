@@ -20,6 +20,7 @@ const int WINDOW_WIDTH  = 1200;
 const int WINDOW_HEIGHT = 600;
 // GLUT window id/handle
 int glutID = 0;
+float X_VIEW=-5.0f, Y_VIEW=3.0f, Z_VIEW=4.0f;
 
 cg::GLSLProgram program;
 
@@ -52,45 +53,53 @@ void initQuad()
 	// Construct triangles. These vectors can go out of scope after we have send all data to the graphics card.
 	// Every side has two triangles á 3 vertices
 	const std::vector<glm::vec3> vertices = {
-		{0.0f, 0.0f, 0.0f},
-		{0.0f, 1.0f, 0.0f},
-		{1.0f, 1.0f, 0.0f},
-
-		{0.0f, 0.0f, 0.0f}, 
-		{1.0f, 0.0f, 0.0f},
-		{1.0f, 0.0f, 1.0f}, 
-
-		{0.0f, 0.0f, 0.0f}, 
-		{1.0f, 0.0f, 1.0f}, 
-		{1.0f, 1.0f, 1.0f}, 
-
-		{0.0f, 0.0f, 0.0f}, 
-		{1.0f, 1.0f, 1.0f}, 
+		{1.0f, 1.0f, 1.0f}, //front
+		{0.0f, 1.0f, 1.0f},
 		{0.0f, 0.0f, 1.0f},
 
-		{0.0f, 0.0f, 0.0f},
-		{1.0f, 1.0f, 0.0f}, 
+		{1.0f, 1.0f, 1.0f}, 
+		{1.0f, 0.0f, 1.0f},
+		{0.0f, 0.0f, 1.0f}, // end front
+
+		{0.0f, 0.0f, 0.0f}, // bottom
+		{1.0f, 0.0f, 1.0f}, 
+		{0.0f, 0.0f, 1.0f}, 
+
+		{0.0f, 0.0f, 0.0f}, 
+		{1.0f, 0.0f, 1.0f}, 
+		{1.0f, 0.0f, 0.0f}, // end bottom
+
+		{0.0f, 0.0f, 0.0f}, // left
+		{0.0f, 1.0f, 0.0f}, 
 		{0.0f, 1.0f, 1.0f},
 
 		{0.0f, 0.0f, 0.0f},
 		{0.0f, 1.0f, 1.0f}, 
-		{0.0f, 0.0f, 1.0f},
+		{0.0f, 0.0f, 1.0f}, // end left
 
-		{1.0f, 1.0f, 0.0f},
+		{1.0f, 1.0f, 0.0f}, // right
 		{1.0f, 0.0f, 1.0f}, 
 		{1.0f, 1.0f, 1.0f}, 
 
 		{1.0f, 1.0f, 0.0f}, 
 		{1.0f, 0.0f, 0.0f}, 
-		{1.0f, 0.0f, 1.0f},
+		{1.0f, 0.0f, 1.0f}, // end right
 
-		{1.0f, 0.0f, 1.0f}, 
+		{1.0f, 0.0f, 1.0f}, // back
 		{0.0f, 1.0f, 1.0f},
 		{0.0f, 0.0f, 1.0f},
 
 		{1.0f, 0.0f, 1.0f},
 		{1.0f, 1.0f, 1.0f}, 
-		{0.0f, 1.0f, 1.0f} 
+		{0.0f, 1.0f, 1.0f}, // end back
+
+		{0.0f, 1.0f, 0.0f}, // top
+		{0.0f, 1.0f, 1.0f},
+		{1.0f, 1.0f, 1.0f},
+
+		{0.0f, 1.0f, 0.0f},
+		{1.0f, 1.0f, 1.0f},
+		{1.0f, 1.0f, 0.0f}  // end top
 
 	};
 	
@@ -133,22 +142,32 @@ void initQuad()
 
 		{ 0.0f, 0.0f, 1.0f }, 
 		{ 0.0f, 0.0f, 1.0f }, 
-		{ 0.0f, 0.0f, 1.0f }  // end back
+		{ 0.0f, 0.0f, 1.0f }, // end back
+
+		{ 1.0f, 1.0f, 1.0f }, // top
+		{ 1.0f, 1.0f, 1.0f },
+		{ 1.0f, 1.0f, 1.0f },
+		{ 1.0f, 1.0f, 1.0f },
+		{ 1.0f, 1.0f, 1.0f },
+		{ 1.0f, 1.0f, 1.0f }  // end top
 
 	};
 
 	// The indices of the sides, beginning at the front
 	const std::vector<GLushort> indices = { 
-		0, 1, 2, // front
-		3, 4, 5,
 		6, 7, 8, // bottom
-		9, 10, 11, 
+		9, 10, 11,
+		24, 25, 26, // back
+		27, 28, 29,
 		12, 13, 14, // left
-		15, 16, 17, 
+		15, 16, 17,
 		18, 19, 20, // right
 		21, 22, 23,
-		24, 25, 26, // back
-		27, 28, 29 
+		30, 31, 32, // top
+		33, 34, 35,
+		0, 1, 2, // front
+		3, 4, 5
+		
 		};
 
 	GLuint programId = program.getHandle();
@@ -161,10 +180,10 @@ void initQuad()
 bool init()
 {
 	// OpenGL: Set "background" color and enable depth testing.
-	glClearColor(0.9f, 0.9f, 0.2f, 1.0f);
+	glClearColor(0.4f, 0.5f, 0.2f, 1.0f);
 
 	// Construct view matrix.
-	glm::vec3 eye(0.0f, 0.0f, 4.0f);
+	glm::vec3 eye(X_VIEW, Y_VIEW, Z_VIEW);
 	glm::vec3 center(0.0f, 0.0f, 0.0f);
 	glm::vec3 up(0.0f, 1.0f, 0.0f);
 
@@ -246,17 +265,23 @@ void glutKeyboard (unsigned char keycode, int x, int y)
 	  return;
 	  
 	case '+':
+		Y_VIEW+=1.0f;
+		init();
+		renderQuad();
 		break;
 	case '-':
+		Y_VIEW-=1.0f;
+		init();
+		renderQuad();
 		break;
-	case 'q':
+	case 'x':
 		// do something
 		break;
-	case 'w':
+	case 'y':
 		// do something
 		break;
 	}
-	
+	render();
 	glutPostRedisplay();
 }
 
